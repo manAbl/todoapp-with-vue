@@ -3,7 +3,11 @@
     <div class="holder">
 
       <form @submit.prevent='addSkill'>
-        <input type="text" placeholder="Enter a skill you have .. " v-model="skill">
+        <input type="text" placeholder="Enter a skill you have.." v-model="skill" v-validate="'min:5'" name="skill">
+
+        <transition name="alert-in">
+          <p class="alert" v-if="errors.has('skill')">{{ errors.first('skill') }}</p>
+        </transition>
       </form>
 
       <ul>
@@ -31,9 +35,15 @@ export default {
   },
   methods: {
     addSkill() {
-      this.skills.push({ skill: this.skill })
-      this.skill = '';
-      console.log('This checkbox value is: ' + this.checked)
+      this.$validator.validateAll().then( result => {
+        if(result) {
+
+          this.skills.push({ skill: this.skill })
+          this.skill = '';
+        } else {
+          alert('not valid');
+        }
+      })
     }
   }
 }
@@ -82,6 +92,32 @@ input {
   font-size: 1.3em;
   width: calc(100% - 40px);
   background-color: #323333;
+}
+.alert {
+  background: #fdf2ce;
+  font-weight: bold;
+  display: inline-block;
+  padding: 5px;
+  margin-top: -20px;
+}
+
+.alert-in-enter-active {
+  animation: bounce-in 500ms;
+}
+.alert-in-leave-active {
+  animation: bounce-in 500ms reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 </style>
